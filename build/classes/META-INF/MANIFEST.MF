@@ -1,0 +1,8 @@
+Manifest-Version: 1.0
+Ant-Version: Apache Ant 1.9.4
+Created-By: 1.8.0_60-b27 (Oracle Corporation)
+Class-Path: lib/mysql-connector-java-5.1.13-bin.jar lib/AbsoluteLayout
+ .jar lib/jcalendar-1.3.2.jar
+X-COMMENT: Main-Class will be added automatically by build
+Main-Class: Presentation.LoginPage
+

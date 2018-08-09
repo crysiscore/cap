@@ -1,0 +1,79 @@
+library(RMySQL)
+library(sqldf)
+DB="cismdss"
+US="aura"
+PA="aura"
+HO="172.16.236.252"
+
+
+con <- dbConnect(dbDriver("MySQL"),
+                 user=US, password=PA, host=HO, dbname=DB)
+
+casas  = dbGetQuery(con, " select  Region, HouseNo, PermIDOFChief from cismdss.dbf_house  order by Region , HouseNo ")
+
+member = dbGetQuery(con, "select  PermID, Region, FamilyNum, HouseNo, exit_type from  cismdss.dbf_client order by Region , FamilyNum" )
+
+
+
+
+casas$HouseNo<-as.integer(casas$HouseNo)
+casas$family_id<-NULL
+member$family_id<-NULL
+casas$totalResidentes <-0
+
+for (i in 1:dim(casas)[1]){
+  
+  
+  casas$family_id[i]= paste(casas$Region[i], "-",casas$HouseNo[i], sep="")
+  
+  
+}
+
+
+for (i in 1:dim(member)[1]){
+  
+  member$family_id[i]= paste(member$Region[i], "-",member$FamilyNum[i], sep="")
+  
+  
+}
+
+
+
+
+
+for (i in 1:dim(casas)[1]){
+
+  
+  
+  casa <-casas$family_id[i]
+  
+  
+  casas$totalResidentes[i]<- length( which(member$family_id == casa))
+  
+  
+       
+}
+
+
+casas$residentes_ativos<-NULL
+
+for (i in 1:dim(casas)[1]){
+  
+  
+  casa <-casas$family_id[i]
+  
+  #total=sqldf( paste("select count(*) from member where  family_id = '",casa,"' and exit_type = '","EXT","' or exit_type = '","DTH' ",sep="" ), drv='SQLite')
+  #casas$residentes_ativos[i]=as.integer(sqldf( paste("select count(*) from member where  family_id = '",casa,"' and exit_type='' ",sep="" ), drv='SQLite'))
+  
+                 
+  casas$residentes_ativos[i]=length( which(member$family_id == casa & member$exit_type=='' ))
+  
+  
+
+ 
+    
+  
+}
+
+
+casasDesabitadas <- subset(casas, casas$residentes_ativos==0,)
